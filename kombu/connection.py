@@ -241,7 +241,7 @@ class Connection(object):
     def _debug(self, msg, *args, **kwargs):
         if self._logger:  # pragma: no cover
             fmt = '[Kombu connection:0x{id:x}] {msg}'
-            logger.debug(fmt.format(id=id(self), msg=text_t(msg)),
+            logger.info(fmt.format(id=id(self), msg=text_t(msg)),
                          *args, **kwargs)
 
     def connect(self):
@@ -446,6 +446,7 @@ class Connection(object):
             )
             for retries in count(0):  # for infinity
                 try:
+                    logger.info("Attempt %s", retries)
                     return fun(*args, **kwargs)
                 except conn_errors as exc:
                     if got_connection and not has_modern_errors:
@@ -463,12 +464,14 @@ class Connection(object):
                     remaining_retries = None
                     if max_retries is not None:
                         remaining_retries = max(max_retries - retries, 1)
+                        logger.info("Retries left: %s", remaining_retries)
                     self.ensure_connection(errback,
                                            remaining_retries,
                                            interval_start,
                                            interval_step,
                                            interval_max)
                     new_channel = self.channel()
+                    logger.info("Reviving with %s", new_channel)
                     self.revive(new_channel)
                     obj.revive(new_channel)
                     if on_revive:
