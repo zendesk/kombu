@@ -174,6 +174,7 @@ class Producer(object):
     def _publish(self, body, priority, content_type, content_encoding,
                  headers, properties, routing_key, mandatory,
                  immediate, exchange, declare):
+        raise Exception("Is this in Datadog?")
         channel = self.channel
         message = channel.prepare_message(
             body, priority, content_type,
